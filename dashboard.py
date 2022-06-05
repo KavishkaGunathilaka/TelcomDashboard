@@ -141,14 +141,6 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     with  st.container():
-        # fig = go.Figure(data=[go.Pie(
-        #                             values=df.Churn.value_counts().values,
-        #                             labels=['No', 'Yes']
-        #                             )])
-        # fig.update_traces(marker=dict(colors=[primaryColor, secondaryColor]))
-        # fig.update_layout(autosize=False, width=graphWidth, height=graphHeight, margin=graphMargins)
-        # st.plotly_chart(fig, use_container_width=True)
-        # st.markdown("""---""")
         fig = make_subplots(rows=2, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}], [{'type':'domain'}, {'type':'domain'}]], subplot_titles=('Churn', 'Voice Mail Plan', 'International Plan', 'Location'))
         fig.add_trace(go.Pie(values=df.Churn.value_counts().values, labels=['No', 'Yes'], name="Churn"), 1, 1)
         fig.add_trace(go.Pie(values=df.voice_mail_plan.value_counts().values, labels=['No', 'Yes'], name="VM plan"), 1, 2)
@@ -193,13 +185,6 @@ with col2:
 
     with st.container():
         try:
-            # colsToPlot = st.multiselect('Select features', options = list(df_enc.columns), default = ['total_day_calls', 'total_eve_calls'], key=0)
-            # fig = sns.pairplot(df_enc, vars = colsToPlot, hue='Churn', palette=[primaryColor, secondaryColor], aspect=2/1.57)
-            # new_labels = ['No', 'Yes']
-            # for t, l in zip(fig._legend.texts, new_labels):
-            #     t.set_text(l)
-            # st.pyplot(fig)
-
             fig = go.Figure(data=go.Splom(
                             dimensions=[dict(label=cl, values=df[cl]) for cl in colsToPlot],
                             marker=dict(color=df_enc['Churn'],
@@ -229,6 +214,15 @@ with col3:
         st.markdown("""---""")
 
     with st.container():
+        modelStatLabels = ["Accuracy", 'F1 Score', 'Precision', 'Recall']
+        modelStats = [0.9719827586206896, 0.9422222222222223, 0.9636363636363636, 0.9217391304347826]
+        fig = px.bar(x=modelStatLabels, y=modelStats, labels={
+                     'x': "Metric",
+                     "y": "Value"
+                 }, width=300, height=300,  color_discrete_sequence=[st.session_state['primaryColor'], st.session_state['secondaryColor']])
+        fig.update_layout(title="LGBM Model Stats", margin=graphMargins)
+        st.plotly_chart(fig, use_container_width=True)
+
         uploaded_file = st.file_uploader("Choose a csv file to predict")
         if uploaded_file is not None:
             data = pd.read_csv(uploaded_file)
